@@ -68,8 +68,8 @@ window.addEventListener("load", function () {
       document.getElementById("subButton").onclick = runSubmit;
       document.getElementById("cardName").oninput = validateName;
       document.getElementById("cardNumber").oninput = validateNumber;
-      document.getElementById("expMonth").onchange = validatedMonth;
-      document.getElementById("expYear").onchange = validatedYear;
+      document.getElementById("expMonth").onchange = validateMonth;
+      document.getElementById("expYear").onchange = validateYear;
       document.getElementById("cvc").oninput = validateCVC;
 });
 
@@ -77,7 +77,7 @@ function runSubmit() {
       validateName();
       validateCredit();
       validateMonth();
-      validatedYear();
+      validateYear();
       validateCVC();
 }
 
@@ -87,11 +87,12 @@ function validateCVC() {
       if (cardCVC.validity.valueMissing) {
             cardCVC.setCustomValidity("enter your CVC number")
       } else if ((creditCard === "amex") && (/^\d{4}$/.test(cardCVC.value) === false)) {
-
-      } else if () {
-
+            cardCVC.setCustomValidity("enter a 4-digit CVC number");
+      } else if ((creditCard !== "amex") && (/^\d{3}$/.test(cardCVC.value) === false)) {
+            cardCVC.setCustomValidity("enter a 3-digit CVC number");
       } else {
-
+            cardCVC.setCustomValidity("")
+            ''
       }
 }
 
@@ -121,6 +122,8 @@ function validateNumber() {
             cardNumber.setCustomValidity("Enter your Card Number")
       } else if (cardNumber.validity.patternMismatch) {
             cardNumber.setCustomValidity("Enter a valid card Number")
+      } else if (luhn(cardNumber.value) === false) {
+            cardNumber.setCustomValidity("enter a legitamite card number");
       } else {
             cardNumber.setCustomValidity("");
       }
@@ -143,4 +146,28 @@ function validateName() {
             cardName.setCustomValidity("");
 
       }
+}
+
+function sumDigits(numStr) {
+      var digitTotal = 0;
+      for (var i = 0; i < numStr.length; i++) {
+            digitTotal += parseInt(numStr.charAt(i));
+      }
+      return digitTotal;
+}
+
+function luhn(idNum) {
+      var string1 = "";
+      var string2 = "";
+
+      //retrive odd number digits
+      for (var i = idNum.length - 1; i >= 0; i -= 2) {
+            string1 += idNum.charAt(i);
+      }
+      //even number digits and double them
+      for (var i = idNum.length - 2; i >= 0; i -= 2) {
+            string2 += 2 * idNum.charAt(i);
+      }
+      //return whether the sum of the digits id divisible by 10;
+      return sumDigits(string1 + string2) % 10 === 0;
 }
